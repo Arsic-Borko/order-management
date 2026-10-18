@@ -14,6 +14,8 @@ public class Order
     
     private readonly List<OrderItem> _items = new();
 
+    public decimal TotalPrice => _items.Sum(x => x.LineTotal);
+
     public Order(Guid orderId)
     {
         if (orderId == Guid.Empty)

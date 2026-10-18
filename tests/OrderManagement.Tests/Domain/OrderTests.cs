@@ -199,6 +199,72 @@ public class OrderTests
         Assert.That(order.Status, Is.EqualTo(OrderStatus.Cancelled));
     }
 
-    private OrderItem CreateOrderItem() => new OrderItem(Guid.NewGuid(), 1, 10m);
+    [Test]
+    public void TotalPrice_CreateEmptyOrder_TotalPriceShouldBeZero()
+    {
+        // Arrange
+        var order = CreateOrder();
+
+        // Act & Assert
+        Assert.That(order.TotalPrice, Is.EqualTo(0m));
+    }
+
+    [Test]
+    public void TotalPrice_WhenOrderHasOneItem_ShouldReturnItemTotal()
+    {
+        // Arrange
+        var order = CreateOrder();
+        var item = CreateOrderItem();
+        order.AddItem(item);
+
+        // Act
+        var initialTotal = order.TotalPrice;
+
+        // Assert
+        Assert.That(initialTotal, Is.EqualTo(10m));
+    }
+
+    [Test]
+    public void TotalPrice_CreateOrderWithManyOrderItems_TotalPriceShouldBeCorrectlyCalculated()
+    {
+        // Arrange
+        var order = CreateOrder();
+        var item1 = CreateOrderItem(2, 100m);
+        var item2 = CreateOrderItem(1, 50m);
+        var item3 = CreateOrderItem(3, 20m);
+        order.AddItem(item1);
+        order.AddItem(item2);
+        order.AddItem(item3);
+
+        // Act
+        var initialTotal = order.TotalPrice;
+
+        // Assert
+        Assert.That(initialTotal, Is.EqualTo(310m));
+    }
+
+    [Test]
+    public void TotalPrice_WhenItemIsAddedAfterInitialRead_ShouldReflectUpdatedTotal()
+    {
+        // Arrange
+        var order = CreateOrder();
+        var item1 = CreateOrderItem();
+        var item2 = CreateOrderItem();
+
+        // Act & Assert
+        order.AddItem(item1);
+        var initialTotal = order.TotalPrice;
+
+        Assert.That(initialTotal, Is.EqualTo(10m));
+
+        order.AddItem(item2);
+        var updatedTotal = order.TotalPrice;
+
+        Assert.That(updatedTotal, Is.EqualTo(20m));
+    }
+
+    private OrderItem CreateOrderItem(int quantity = 1, decimal unitPrice = 10m)
+        => new OrderItem(Guid.NewGuid(), quantity, unitPrice);
+
     private Order CreateOrder() => new Order(Guid.NewGuid());
 }
