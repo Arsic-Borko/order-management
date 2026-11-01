@@ -1,6 +1,7 @@
 ﻿using NSubstitute;
 using OrderManagement.Application.Contracts;
 using OrderManagement.Application.Services;
+using OrderManagement.Domain.Models.Orders;
 
 namespace OrderManagement.Tests.Application;
 
@@ -25,5 +26,16 @@ public class OrderServiceTests
 
         // Assert
         Assert.That(orderId, Is.Not.EqualTo(Guid.Empty));
+    }
+
+    [Test]
+    public async Task CreateOrderAsync_WhenCalled_ShouldAddOrderToRepository()
+    {
+        // Act
+        var orderId = await _orderService.CreateOrderAsync();
+
+        // Assert
+        await _orderRepository.Received(1).AddAsync(
+            Arg.Is<Order>(order => order.OrderId == orderId));
     }
 }
