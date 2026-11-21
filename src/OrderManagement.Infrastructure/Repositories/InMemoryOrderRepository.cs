@@ -20,4 +20,11 @@ public class InMemoryOrderRepository : IOrderRepository
 
         return Task.CompletedTask;
     }
+
+    public Task<Order?> GetByIdAsync(Guid orderId)
+    {
+        _orders.TryGetValue(orderId, out var order);
+
+        return Task.FromResult(order);
+    }
 }
